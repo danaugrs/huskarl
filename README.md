@@ -34,6 +34,7 @@ Since TensorFlow 2.0 is not officially out yet you need to install it and other 
 ```
 pip install tf-nightly-2.0-preview
 pip install cloudpickle
+pip install scipy
 pip install huskarl --no-deps
 ```
 
