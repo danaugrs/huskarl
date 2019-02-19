@@ -6,7 +6,7 @@ Huskarl is a framework for deep reinforcement learning focused on research and f
 It's built on TensorFlow 2.0 and uses the `tf.keras` API when possible for conciseness and readability.
 
 Huskarl makes it easy to parallelize computation of environment dynamics across multiple CPUs.
-This is useful for speeding up on-policy learning algorithms that require multiple sources of experience such as A2C or PPO.
+This is useful for speeding up on-policy learning algorithms that benefit from multiple concurrent sources of experience such as A2C or PPO.
 It is specially useful for computationally intensive environments such as physics-based ones.
 
 Huskarl works seamlessly with [OpenAI Gym](https://gym.openai.com/) environments.
