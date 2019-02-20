@@ -8,7 +8,7 @@ class Agent:
 
 	Do not use this abstract base class directly but instead use one of the concrete agents implemented.
 
-    To implement your own agent, you have to implement the following methods:
+	To implement your own agent, you have to implement the following methods:
 	"""
 	def save(self, filename, overwrite=False):
 		"""Saves the model parameters to the specified file."""

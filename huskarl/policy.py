@@ -6,7 +6,7 @@ from scipy.stats import truncnorm
 class Policy:
 	"""Abstract base class for all implemented policies.
 	
-    Do not use this abstract base class directly but instead use one of the concrete policies implemented.
+	Do not use this abstract base class directly but instead use one of the concrete policies implemented.
 
 	A policy ultimately returns the action to be taken based on the output of the agent.
 	The policy is the place to implement action-space exploration strategies.
@@ -14,14 +14,14 @@ class Policy:
 	A discrete action-space policy can explore by pick an action at random with a small probability e.g. EpsilonGreedy.
 	If the action space is continouous, the policy usually receives a single action or a distribution over actions.
 	A continuous action-space policy can simply sample from the distribution and/or add noise to the received action.	
-    
-    To implement your own policy, you have to implement the following method:
-    """
+	
+	To implement your own policy, you have to implement the following method:
+	"""
 	def act(self, **kwargs):
 		raise NotImplementedError()
 
 
-# Discrete action-space policies ==============================================
+# Discrete action-space policies =======================================================================================
 
 
 class Greedy(Policy):
@@ -63,3 +63,16 @@ class GaussianEpsGreedy(Policy):
 		if random.random() > eps:
 			return np.argmax(qvals)
 		return random.randrange(len(qvals))
+
+
+# Continuous action-space policies (noise generators) ==================================================================
+
+
+class PassThrough(Policy):
+	"""Pass-Through Policy
+
+	This policy simply outputs the model's output, unchanged.
+	"""
+	def act(self, action):
+		return action
+

@@ -22,7 +22,7 @@ class DQN(Agent):
 
 	"""
 	def __init__(self, model, actions, optimizer=None, policy=None, test_policy=None,
-				 memsize=10_000,	target_update_steps=10,	gamma=0.99, batch_size=64, nsteps=1,
+				 memsize=10_000, target_update_steps=10, gamma=0.99, batch_size=64, nsteps=1,
 				 enable_double_dqn=True, enable_dueling_network=False, dueling_type='avg'):
 		"""
 		TODO: Describe parameters
