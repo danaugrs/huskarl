@@ -12,7 +12,7 @@ class Policy:
 	The policy is the place to implement action-space exploration strategies.
 	If the action space is discrete, the policy usually receives action values and has to pick an action/index.
 	A discrete action-space policy can explore by pick an action at random with a small probability e.g. EpsilonGreedy.
-	If the action space is continouous, the policy usually receives a single action or a distribution over actions.
+	If the action space is continuous, the policy usually receives a single action or a distribution over actions.
 	A continuous action-space policy can simply sample from the distribution and/or add noise to the received action.	
 	
 	To implement your own policy, you have to implement the following method:
