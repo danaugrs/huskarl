@@ -66,7 +66,7 @@ class A2C(Agent):
 
 	def save(self, filename, overwrite=False):
 		"""Saves the model parameters to the specified file."""
-		self.model.save_weights(filepath, overwrite=overwrite)
+		self.model.save_weights(filename, overwrite=overwrite)
 
 	def act(self, state, instance=0):
 		"""Returns the action to be taken given a state."""
