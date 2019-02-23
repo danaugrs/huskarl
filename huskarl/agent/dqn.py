@@ -22,7 +22,7 @@ class DQN(Agent):
 
 	"""
 	def __init__(self, model, actions, optimizer=None, policy=None, test_policy=None,
-				 memsize=10_000, target_update_steps=10, gamma=0.99, batch_size=64, nsteps=1,
+				 memsize=10_000, target_update=10, gamma=0.99, batch_size=64, nsteps=1,
 				 enable_double_dqn=True, enable_dueling_network=False, dueling_type='avg'):
 		"""
 		TODO: Describe parameters
@@ -36,7 +36,7 @@ class DQN(Agent):
 		self.memsize = memsize
 		self.memory = ExperienceReplay(memsize, nsteps)
 
-		self.target_update_steps = target_update_steps
+		self.target_update = target_update
 		self.gamma = gamma
 		self.batch_size = batch_size
 		self.nsteps = nsteps
@@ -99,9 +99,15 @@ class DQN(Agent):
 		if len(self.memory) == 0:
 			return
 
-		# Update target network every specified number of steps
-		if step % self.target_update_steps == 0:
+		# Update target network
+		if self.target_update >= 1 and step % self.target_update == 0:
+			# Perform a hard update
 			self.target_model.set_weights(self.model.get_weights())
+		elif self.target_update < 1:
+			# Perform a soft update
+			mw = np.array(self.model.get_weights())
+			tmw = np.array(self.target_model.get_weights())
+			self.target_model.set_weights(self.target_update * mw + (1 - self.target_update) * tmw)
 
 		# Train even when memory has fewer than the specified batch_size
 		batch_size = min(len(self.memory), self.batch_size)
