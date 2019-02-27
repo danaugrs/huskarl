@@ -143,4 +143,4 @@ class DQN(Agent):
 			target_qvals = rewards + (self.gamma * target_qvals)
 
 		loss_data = np.stack([action_batch, target_qvals]).transpose()
-		loss = self.model.train_on_batch(np.array(state_batch), loss_data)
+		self.model.train_on_batch(np.array(state_batch), loss_data)

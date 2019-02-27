@@ -107,4 +107,4 @@ class A2C(Agent):
 		targets_actions[ran, 0] = target_qvals
 		targets_actions[ran, np.array(action_batch)+1] = 1
 
-		loss = self.model.train_on_batch(np.array(state_batch), targets_actions)
+		self.model.train_on_batch(np.array(state_batch), targets_actions)
