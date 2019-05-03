@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 setup(
 	name='huskarl',
-	version='0.1',
+	version='0.4',
 	description='Deep Reinforcement Learning Framework',
 	author='Daniel Salvadori',
 	author_email='danaugrs@gmail.com',
@@ -16,10 +16,10 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
     ],
-	python_requires='>=3',
+	python_requires='>=3.6',
 	install_requires=[
 		'cloudpickle',
-		'tensorflow>=2',
+		'tensorflow==2.0.0a0',
 		'scipy',
 	],
 	packages=find_packages()
