@@ -1,6 +1,6 @@
 <img align="left" src="https://github.com/danaugrs/huskarl/blob/master/logo.png">
 
-# Huskarl
+# Huskarl [![PyPI version](https://badge.fury.io/py/huskarl.svg)](https://badge.fury.io/py/huskarl)
 
 Huskarl is a framework for deep reinforcement learning focused on research and fast prototyping.
 It's built on TensorFlow 2.0 and uses the `tf.keras` API when possible for conciseness and readability.
