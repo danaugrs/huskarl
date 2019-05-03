@@ -30,12 +30,8 @@ Several algorithms are implemented already and many more are planned.
 
 ## Installation
 
-Since TensorFlow 2.0 is not officially out yet you need to install it and other dependencies manually for now:
 ```
-pip install tf-nightly-2.0-preview
-pip install cloudpickle
-pip install scipy
-pip install huskarl --no-deps
+pip install huskarl
 ```
 
 ## Citing
