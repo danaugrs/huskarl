@@ -29,10 +29,23 @@ Several algorithms are implemented already and many more are planned.
 
 
 ## Installation
-
+To install the latest published version:
 ```
 pip install huskarl
 ```
+To install directly from source clone this repository and run the following command inside it:
+```
+pip install -e .
+```
+
+## Examples
+To run the examples you will need `matplotlib` and `gym`.
+### dqn-cartpole.py
+![dqn-cartpole.gif](examples/dqn-cartpole.gif)
+### ddpg-pendulum.py
+![ddpg-pendulum.gif](examples/ddpg-pendulum.gif)
+### a2c-cartpole.py
+![a2c-cartpole.gif](examples/a2c-cartpole.gif)
 
 ## Citing
 
