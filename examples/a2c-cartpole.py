@@ -34,7 +34,7 @@ if __name__ == '__main__':
 		plt.xlabel('Step')
 		plt.ylabel('Reward')
 		for i, (ed, steps) in enumerate(zip(episode_rewards, episode_steps)):
-			plt.plot(np.array(steps), np.array(ed), alpha=0.5 if i == 0 else 0.2, linewidth=2 if i == 0 else 1)
+			plt.plot(steps, ed, alpha=0.5 if i == 0 else 0.2, linewidth=2 if i == 0 else 1)
 		plt.show() if done else plt.pause(0.001) # Pause a bit so that the graph is updated
 		
 	# Create simulation, train for a short period, and then test

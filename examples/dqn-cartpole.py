@@ -2,7 +2,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 import matplotlib.pyplot as plt
-import numpy as np
 import gym
 
 import huskarl as hk
@@ -28,7 +27,7 @@ if __name__ == '__main__':
 		plt.xlabel('Step')
 		plt.ylabel('Reward')
 		for ed, steps in zip(episode_rewards, episode_steps):
-			plt.plot(np.array(steps), np.array(ed))
+			plt.plot(steps, ed)
 		plt.show() if done else plt.pause(0.001) # Pause a bit so that the graph is updated
 
 	# Create simulation, train for a short period, and then test
