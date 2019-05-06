@@ -41,7 +41,7 @@ pip install huskarl
 ```
 
 ## Examples
-To run the examples you will need [`matplotlib`](https://github.com/matplotlib/matplotlib) and [`gym`](https://github.com/openai/gym) installed.
+There are three examples included - one for each implemented agent type. To run the examples you will need [`matplotlib`](https://github.com/matplotlib/matplotlib) and [`gym`](https://github.com/openai/gym) installed.
 ### dqn-cartpole.py
 ![dqn-cartpole.gif](examples/dqn-cartpole.gif)
 ### ddpg-pendulum.py
