@@ -37,7 +37,7 @@ pip install -e .
 ```
 If you prefer, you can get the packaged version from [PyPI](https://pypi.org/project/huskarl/):
 ```
-pip install huskarl.
+pip install huskarl
 ```
 
 ## Examples
