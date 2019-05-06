@@ -29,17 +29,19 @@ Several algorithms are implemented already and many more are planned.
 
 
 ## Installation
-To install the latest published version:
+You can install from source by executing:
 ```
-pip install huskarl
-```
-To install directly from source clone this repository and run the following command inside it:
-```
+git clone https://github.com/danaugrs/huskarl.git
+cd huskarl
 pip install -e .
+```
+If you prefer, you can get the packaged version from [PyPI](https://pypi.org/project/huskarl/):
+```
+pip install huskarl.
 ```
 
 ## Examples
-To run the examples you will need `matplotlib` and `gym`.
+To run the examples you will need [`matplotlib`](https://github.com/matplotlib/matplotlib) and [`gym`](https://github.com/openai/gym) installed.
 ### dqn-cartpole.py
 ![dqn-cartpole.gif](examples/dqn-cartpole.gif)
 ### ddpg-pendulum.py
