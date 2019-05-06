@@ -29,7 +29,7 @@ Several algorithms are implemented already and many more are planned.
 
 
 ## Installation
-You can install from source by executing:
+You can install the latest version from source with:
 ```
 git clone https://github.com/danaugrs/huskarl.git
 cd huskarl
@@ -41,12 +41,13 @@ pip install huskarl
 ```
 
 ## Examples
-There are three examples included - one for each implemented agent type. To run the examples you will need [`matplotlib`](https://github.com/matplotlib/matplotlib) and [`gym`](https://github.com/openai/gym) installed.
-### dqn-cartpole.py
+There are three examples included - one for each implemented agent type. To run the examples you will need [`matplotlib`](https://github.com/matplotlib/matplotlib) and [`gym`](https://github.com/openai/gym) installed. 
+
+### [dqn-cartpole.py](https://github.com/danaugrs/huskarl/blob/master/examples/dqn-cartpole.py)
 ![dqn-cartpole.gif](examples/dqn-cartpole.gif)
-### ddpg-pendulum.py
+### [ddpg-pendulum.py](https://github.com/danaugrs/huskarl/blob/master/examples/ddpg-pendulum.py)
 ![ddpg-pendulum.gif](examples/ddpg-pendulum.gif)
-### a2c-cartpole.py
+### [a2c-cartpole.py](https://github.com/danaugrs/huskarl/blob/master/examples/a2c-cartpole.py)
 ![a2c-cartpole.gif](examples/a2c-cartpole.gif)
 
 ## Citing
