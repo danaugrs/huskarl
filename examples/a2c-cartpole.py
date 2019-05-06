@@ -36,8 +36,8 @@ if __name__ == '__main__':
 		for i, (ed, steps) in enumerate(zip(episode_rewards, episode_steps)):
 			plt.plot(steps, ed, alpha=0.5 if i == 0 else 0.2, linewidth=2 if i == 0 else 1)
 		plt.show() if done else plt.pause(0.001) # Pause a bit so that the graph is updated
-		
-	# Create simulation, train for a short period, and then test
+
+	# Create simulation, train and then test
 	sim = hk.Simulation(create_env, agent)
 	sim.train(max_steps=5000, instances=instances, plot=plot_rewards)
 	sim.test(max_steps=1000)

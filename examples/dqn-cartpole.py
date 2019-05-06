@@ -30,7 +30,7 @@ if __name__ == '__main__':
 			plt.plot(steps, ed)
 		plt.show() if done else plt.pause(0.001) # Pause a bit so that the graph is updated
 
-	# Create simulation, train for a short period, and then test
+	# Create simulation, train and then test
 	sim = hk.Simulation(create_env, agent)
 	sim.train(max_steps=3000, visualize=True, plot=plot_rewards)
 	sim.test(max_steps=1000)
