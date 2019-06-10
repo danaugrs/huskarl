@@ -1,10 +1,12 @@
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import MSE
 import tensorflow as tf
 import numpy as np
 
 from huskarl.policy import PassThrough
 from huskarl.core import Agent
-from huskarl.memory import ExperienceReplay
+from huskarl import memory
+
 
 class DDPG(Agent):
 	"""Deep Deterministic Policy Gradient
@@ -12,7 +14,7 @@ class DDPG(Agent):
 	"Continuous control with deep reinforcement learning" (Lillicrap et al., 2015)
 	"""
 	def __init__(self, actor=None, critic=None, optimizer_critic=None, optimizer_actor=None,
-				 policy=None, test_policy=None, memsize=100_000, target_update=1e-3,
+				 policy=None, test_policy=None, memsize=10_000, target_update=1e-3,
 				 gamma=0.99, batch_size=32, nsteps=1):
 		"""
 		TODO: Describe parameters
@@ -20,14 +22,14 @@ class DDPG(Agent):
 		self.actor = actor
 		self.critic = critic
 
-		self.optimizer_critic = Adam(lr=5e-3) if optimizer_critic is None else optimizer_critic
 		self.optimizer_actor = Adam(lr=5e-3) if optimizer_actor is None else optimizer_actor
+		self.optimizer_critic = Adam(lr=5e-3) if optimizer_critic is None else optimizer_critic
 
 		self.policy = PassThrough() if policy is None else policy
 		self.test_policy = PassThrough() if test_policy is None else test_policy
 
 		self.memsize = memsize
-		self.memory = ExperienceReplay(memsize, nsteps)
+		self.memory = memory.PrioritizedExperienceReplay(memsize, nsteps, prob_alpha=0.2)
 
 		self.target_update = target_update
 		self.gamma = gamma
@@ -39,18 +41,35 @@ class DDPG(Agent):
 		self.target_actor = tf.keras.models.clone_model(self.actor)
 		self.target_critic = tf.keras.models.clone_model(self.critic)
 
-		self.critic.compile(optimizer=self.optimizer_critic, loss='mse')
+		# Define loss function that computes the MSE between target Q-values and cumulative discounted rewards
+		# If using PrioritizedExperienceReplay, the loss function also computes the TD error and updates the trace priorities
+		def q_loss(data, qvals):
+			"""Computes the MSE between the Q-values of the actions that were taken and	the cumulative discounted
+			rewards obtained after taking those actions. Updates trace priorities if using PrioritizedExperienceReplay.
+			"""
+			target_qvals = data[:, 0, np.newaxis]
+			if isinstance(self.memory, memory.PrioritizedExperienceReplay):
+				def update_priorities(_qvals, _target_qvals, _traces_idxs):
+					"""Computes the TD error and updates memory priorities."""
+					td_error = np.abs((_target_qvals - _qvals).numpy())[:, 0]
+					_traces_idxs = (tf.cast(_traces_idxs, tf.int32)).numpy()
+					self.memory.update_priorities(_traces_idxs, td_error)
+					return _qvals
+				qvals = tf.py_function(func=update_priorities, inp=[qvals, target_qvals, data[:, 1]], Tout=tf.float32)
+			return MSE(target_qvals, qvals)
+
+		self.critic.compile(optimizer=self.optimizer_critic, loss=q_loss)
 
 		# To train the actor we want to maximize the critic's output (action value) given the predicted action as input
 		# Namely we want to change the actor's weights such that it picks the action that has the highest possible value
 		state_input = self.critic.input[1]
 		critic_output = self.critic([self.actor(state_input), state_input])
 		my_loss = -tf.keras.backend.mean(critic_output)
-		with my_loss.graph.as_default():
+		with my_loss.graph.as_default(): # This line is a workaround: https://github.com/tensorflow/tensorflow/issues/26098
 			actor_updates = self.optimizer_actor.get_updates(params=self.actor.trainable_weights, loss=my_loss)
 		self.actor_train_on_batch = tf.keras.backend.function(inputs=[state_input], outputs=[self.actor(state_input)], updates=actor_updates)
 
-	def save_weights(self, filename, overwrite=False):
+	def save(self, filename, overwrite=False):
 		"""Saves the model parameters to the specified file(s)."""
 		self.actor.save_weights(filename+"_actor", overwrite=overwrite)
 		self.critic.save_weights(filename+"_critic", overwrite=overwrite)
@@ -58,14 +77,11 @@ class DDPG(Agent):
 	def act(self, state, instance=0):
 		"""Returns the action to be taken given a state."""
 		action = self.actor.predict(np.array([state]))[0]
-		if self.training:
-			return self.policy[instance].act(action) if isinstance(self.policy, list) else self.policy.act(action)
-		else:
-			return self.test_policy[instance].act(action) if isinstance(self.test_policy, list) else self.test_policy.act(action)
+		return self.policy.act(action) if self.training else self.test_policy.act(action)
 
 	def push(self, transition, instance=0):
 		"""Stores the transition in memory."""
-		self.memory.put(transition, instance)
+		self.memory.put(transition)
 
 	def train(self, step):
 		"""Trains the agent for one step."""
@@ -89,7 +105,7 @@ class DDPG(Agent):
 		# Train even when memory has fewer than the specified batch_size
 		batch_size = min(len(self.memory), self.batch_size)
 
-		# Sample from memory (experience replay)
+		# Sample batch_size traces from memory
 		state_batch, action_batch, reward_batches, end_state_batch, not_done_mask = self.memory.get(batch_size)
 
 		# Compute the value of the last next states
@@ -107,5 +123,10 @@ class DDPG(Agent):
 			target_qvals *= np.array([t[n] for t in not_done_mask])
 			target_qvals = rewards + (self.gamma * target_qvals)
 
-		self.critic.train_on_batch([np.array(action_batch), np.array(state_batch)], target_qvals)
+		# Train actor
 		self.actor_train_on_batch([np.array(state_batch)])
+
+		# Train critic
+		PER = isinstance(self.memory, memory.PrioritizedExperienceReplay)
+		critic_loss_data = np.stack([target_qvals, self.memory.last_traces_idxs()], axis=1) if PER else target_qvals
+		self.critic.train_on_batch([np.array(action_batch), np.array(state_batch)], critic_loss_data)

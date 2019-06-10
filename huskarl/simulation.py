@@ -180,7 +180,7 @@ class Simulation:
 
 
 def _train(create_env, instance_ids, max_steps, pipes, visualize):
-	"""This function is to be executed in a subprocess"""
+	"""This function is to be executed in a subprocess."""
 	pipes = {iid: p for iid, p in zip(instance_ids, pipes)}
 	actions = {iid: None for iid in instance_ids} # Reused dictionary of actions
 

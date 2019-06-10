@@ -6,7 +6,7 @@ import numpy as np
 
 from huskarl.policy import EpsGreedy, Greedy
 from huskarl.core import Agent, HkException
-from huskarl.memory import ExperienceReplay
+from huskarl import memory
 
 
 class DQN(Agent):
@@ -19,7 +19,6 @@ class DQN(Agent):
 		Multi-step returns: "Reinforcement Learning: An Introduction" 2nd ed. (Sutton & Barto, 2018)
 		Double Q-Learning: "Deep Reinforcement Learning with Double Q-learning" (van Hasselt et al., 2015)
 		Dueling Q-Network: "Dueling Network Architectures for Deep Reinforcement Learning" (Wang et al., 2016)
-
 	"""
 	def __init__(self, model, actions, optimizer=None, policy=None, test_policy=None,
 				 memsize=10_000, target_update=10, gamma=0.99, batch_size=64, nsteps=1,
@@ -34,7 +33,7 @@ class DQN(Agent):
 		self.test_policy = Greedy() if test_policy is None else test_policy
 
 		self.memsize = memsize
-		self.memory = ExperienceReplay(memsize, nsteps)
+		self.memory = memory.PrioritizedExperienceReplay(memsize, nsteps)
 
 		self.target_update = target_update
 		self.gamma = gamma
@@ -63,13 +62,24 @@ class DQN(Agent):
 
 		self.model = Model(inputs=model.input, outputs=output_layer)
 
+		# Define loss function that computes the MSE between target Q-values and cumulative discounted rewards
+		# If using PrioritizedExperienceReplay, the loss function also computes the TD error and updates the trace priorities
 		def masked_q_loss(data, y_pred):
-			# Compute the MSE between the Q-values of the actions that were taken and
-			# the cumulutive discounted rewards obtained after taking those actions
-			action_batch, target_qvals = data[:,0], data[:,1]
+			"""Computes the MSE between the Q-values of the actions that were taken and	the cumulative discounted
+			rewards obtained after taking those actions. Updates trace priorities if using PrioritizedExperienceReplay.
+			"""
+			action_batch, target_qvals = data[:, 0], data[:, 1]
 			seq = tf.cast(tf.range(0, tf.shape(action_batch)[0]), tf.int32)
 			action_idxs = tf.transpose(tf.stack([seq, tf.cast(action_batch, tf.int32)]))
 			qvals = tf.gather_nd(y_pred, action_idxs)
+			if isinstance(self.memory, memory.PrioritizedExperienceReplay):
+				def update_priorities(_qvals, _target_qvals, _traces_idxs):
+					"""Computes the TD error and updates memory priorities."""
+					td_error = np.abs((_target_qvals - _qvals).numpy())
+					_traces_idxs = (tf.cast(_traces_idxs, tf.int32)).numpy()
+					self.memory.update_priorities(_traces_idxs, td_error)
+					return _qvals
+				qvals = tf.py_function(func=update_priorities, inp=[qvals, target_qvals, data[:,2]], Tout=tf.float32)
 			return tf.keras.losses.mse(qvals, target_qvals)
 
 		self.model.compile(optimizer=self.optimizer, loss=masked_q_loss)
@@ -85,14 +95,11 @@ class DQN(Agent):
 	def act(self, state, instance=0):
 		"""Returns the action to be taken given a state."""
 		qvals = self.model.predict(np.array([state]))[0]
-		if self.training:
-			return self.policy[instance].act(qvals) if isinstance(self.policy, list) else self.policy.act(qvals)
-		else:
-			return self.test_policy[instance].act(qvals) if isinstance(self.test_policy, list) else self.test_policy.act(qvals)
+		return self.policy.act(qvals) if self.training else self.test_policy.act(qvals)
 
 	def push(self, transition, instance=0):
 		"""Stores the transition in memory."""
-		self.memory.put(transition, instance)
+		self.memory.put(transition)
 
 	def train(self, step):
 		"""Trains the agent for one step."""
@@ -112,7 +119,7 @@ class DQN(Agent):
 		# Train even when memory has fewer than the specified batch_size
 		batch_size = min(len(self.memory), self.batch_size)
 
-		# Sample from memory (experience replay)
+		# Sample batch_size traces from memory
 		state_batch, action_batch, reward_batches, end_state_batch, not_done_mask = self.memory.get(batch_size)
 
 		# Compute the value of the last next states
@@ -142,5 +149,13 @@ class DQN(Agent):
 			target_qvals *= np.array([t[n] for t in not_done_mask])
 			target_qvals = rewards + (self.gamma * target_qvals)
 
-		loss_data = np.stack([action_batch, target_qvals]).transpose()
-		self.model.train_on_batch(np.array(state_batch), loss_data)
+		# Compile information needed by the custom loss function
+		loss_data = [action_batch, target_qvals]
+
+		# If using PrioritizedExperienceReplay then we need to provide the trace indexes
+		# to the loss function as well so we can update the priorities of the traces
+		if isinstance(self.memory, memory.PrioritizedExperienceReplay):
+			loss_data.append(self.memory.last_traces_idxs())
+
+		# Train model
+		self.model.train_on_batch(np.array(state_batch), np.stack(loss_data).transpose())

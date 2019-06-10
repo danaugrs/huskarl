@@ -6,7 +6,7 @@ import numpy as np
 
 from huskarl.policy import Greedy, GaussianEpsGreedy
 from huskarl.core import Agent
-import huskarl.memory
+from huskarl import memory
 
 
 class A2C(Agent):
@@ -26,7 +26,7 @@ class A2C(Agent):
 		"""
 		self.actions = actions
 		self.optimizer = Adam(lr=3e-3) if optimizer is None else optimizer
-		self.memory = huskarl.memory.OnPolicy(steps=nsteps, instances=instances)
+		self.memory = memory.OnPolicy(steps=nsteps, instances=instances)
 
 		if policy is None:
 			# Create one policy per instance, with varying exploration parameters
