@@ -23,8 +23,8 @@ Several algorithms are implemented and more are planned.
 * [x] Dueling Architecture DQN
 * [x] Advantage Actor-Critic (A2C)
 * [x] Deep Deterministic Policy Gradient (DDPG)
+* [x] Prioritized Experience Replay
 * [ ] Proximal Policy Optimization (PPO)
-* [ ] Prioritized Experience Replay
 * [ ] Curiosity-Driven Exploration
 
 
