@@ -15,7 +15,7 @@ There are plans to support multi-agent environments and [Unity3D environments](h
 
 ## Algorithms
 
-Several algorithms are implemented already and many more are planned.
+Several algorithms are implemented and more are planned.
 
 * [x] Deep Q-Learning Network (DQN)
 * [x] Multi-step DQN
