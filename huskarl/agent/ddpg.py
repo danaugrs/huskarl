@@ -65,8 +65,7 @@ class DDPG(Agent):
 		state_input = self.critic.input[1]
 		critic_output = self.critic([self.actor(state_input), state_input])
 		my_loss = -tf.keras.backend.mean(critic_output)
-		with my_loss.graph.as_default(): # This line is a workaround: https://github.com/tensorflow/tensorflow/issues/26098
-			actor_updates = self.optimizer_actor.get_updates(params=self.actor.trainable_weights, loss=my_loss)
+		actor_updates = self.optimizer_actor.get_updates(params=self.actor.trainable_weights, loss=my_loss)
 		self.actor_train_on_batch = tf.keras.backend.function(inputs=[state_input], outputs=[self.actor(state_input)], updates=actor_updates)
 
 	def save(self, filename, overwrite=False):
