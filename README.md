@@ -7,7 +7,7 @@ It's built on TensorFlow 2.0 and uses the `tf.keras` API when possible for conci
 
 Huskarl makes it easy to parallelize computation of environment dynamics across multiple CPU cores.
 This is useful for speeding up on-policy learning algorithms that benefit from multiple concurrent sources of experience such as A2C or PPO.
-It is specially useful for computationally intensive environments such as physics-based ones.
+It is especially useful for computationally intensive environments such as physics-based ones.
 
 Huskarl works seamlessly with [OpenAI Gym](https://gym.openai.com/) environments.
 
