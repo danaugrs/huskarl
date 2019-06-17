@@ -2,10 +2,10 @@
 
 # Huskarl [![PyPI version](https://badge.fury.io/py/huskarl.svg)](https://badge.fury.io/py/huskarl)
 
-Huskarl is a framework for deep reinforcement learning focused on research and fast prototyping.
+Huskarl is a framework for deep reinforcement learning focused on modularity and fast prototyping.
 It's built on TensorFlow 2.0 and uses the `tf.keras` API when possible for conciseness and readability.
 
-Huskarl makes it easy to parallelize computation of environment dynamics across multiple CPUs.
+Huskarl makes it easy to parallelize computation of environment dynamics across multiple CPU cores.
 This is useful for speeding up on-policy learning algorithms that benefit from multiple concurrent sources of experience such as A2C or PPO.
 It is specially useful for computationally intensive environments such as physics-based ones.
 
