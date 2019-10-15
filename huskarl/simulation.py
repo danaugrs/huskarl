@@ -1,10 +1,6 @@
-from itertools import count
 from collections import namedtuple
-from queue import Empty
-from time import sleep
 import multiprocessing as mp
 
-import numpy as np
 import cloudpickle # For pickling lambda functions and more
 
 from huskarl.memory import Transition
