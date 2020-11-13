@@ -19,7 +19,7 @@ setup(
 	python_requires='>=3.6',
 	install_requires=[
 		'cloudpickle',
-		'tensorflow==2.0.0',
+		'tensorflow==2.3.1',
 		'scipy',
 	],
 	packages=find_packages()
